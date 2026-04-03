@@ -1,63 +1,137 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Navigation from '@/components/Navigation';
+import Calendar from '@/components/Calendar';
+import { bookingsAPI, roomsAPI, guestsAPI } from '@/lib/api';
+
+export default function Dashboard() {
+  const [stats, setStats] = useState({
+    checkInsToday: 0,
+    checkOutsToday: 0,
+    roomsNeedCleaning: 0,
+  });
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [guests, setGuests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  async function loadStats() {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const [bookingsData, roomsData, guestsData] = await Promise.all([
+        bookingsAPI.getAll(),
+        roomsAPI.getAll(),
+        guestsAPI.getAll(),
+      ]);
+
+      setBookings(bookingsData);
+      setRooms(roomsData);
+      setGuests(guestsData);
+
+      // Count check-ins today
+      const checkInsToday = bookingsData.filter((b: any) => {
+        const checkIn = new Date(b.checkIn);
+        checkIn.setHours(0, 0, 0, 0);
+        return checkIn.getTime() === today.getTime();
+      }).length;
+
+      // Count check-outs today
+      const checkOutsToday = bookingsData.filter((b: any) => {
+        const checkOut = new Date(b.checkOut);
+        checkOut.setHours(0, 0, 0, 0);
+        return checkOut.getTime() === today.getTime();
+      }).length;
+
+      // Count rooms needing cleaning
+      const roomsNeedCleaning = roomsData.filter((r: any) => r.housekeepingStatus === 'dirty').length;
+
+      setStats({
+        checkInsToday,
+        checkOutsToday,
+        roomsNeedCleaning,
+      });
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Navigation />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <p className="text-center text-slate-600">Loading dashboard...</p>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-slate-50">
+      <Navigation />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-3xl font-bold text-slate-900 mb-6">Dashboard</h1>
+        
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="card">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Today&apos;s Check-ins</h2>
+            <p className="text-3xl font-bold text-blue-600">{stats.checkInsToday}</p>
+            <p className="text-sm text-slate-500 mt-2">
+              {stats.checkInsToday === 0 ? 'No check-ins scheduled' : `${stats.checkInsToday} guest${stats.checkInsToday > 1 ? 's' : ''} arriving`}
+            </p>
+          </div>
+
+          <div className="card">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Today&apos;s Check-outs</h2>
+            <p className="text-3xl font-bold text-green-600">{stats.checkOutsToday}</p>
+            <p className="text-sm text-slate-500 mt-2">
+              {stats.checkOutsToday === 0 ? 'No check-outs scheduled' : `${stats.checkOutsToday} guest${stats.checkOutsToday > 1 ? 's' : ''} departing`}
+            </p>
+          </div>
+
+          <div className="card">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Rooms Need Cleaning</h2>
+            <p className="text-3xl font-bold text-orange-600">{stats.roomsNeedCleaning}</p>
+            <p className="text-sm text-slate-500 mt-2">
+              {stats.roomsNeedCleaning === 0 ? 'All rooms clean' : `${stats.roomsNeedCleaning} room${stats.roomsNeedCleaning > 1 ? 's' : ''} need attention`}
+            </p>
+            {stats.roomsNeedCleaning > 0 && (
+              <Link href="/housekeeping" className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                View Housekeeping →
+              </Link>
+            )}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Calendar View */}
+        <div className="card mb-8">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Booking Calendar</h2>
+          <Calendar bookings={bookings} rooms={rooms} guests={guests} compact={false} />
+        </div>
+
+        {/* Quick Actions */}
+        <div className="text-center">
+          <p className="text-slate-600 mb-4">Ready to create a booking?</p>
+          <div className="flex gap-4 justify-center">
+            <Link href="/bookings/new" className="btn-primary inline-block">
+              Create Individual Booking
+            </Link>
+            <Link href="/groups/new" className="btn-secondary inline-block">
+              Create Group Booking
+            </Link>
+          </div>
         </div>
       </main>
     </div>

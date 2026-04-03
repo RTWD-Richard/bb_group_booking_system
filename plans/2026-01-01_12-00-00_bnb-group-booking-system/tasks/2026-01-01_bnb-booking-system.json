@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "content": "[P1-1] Initialize Next.js app with TypeScript, Tailwind, and install dependencies (Turso, Drizzle, Netlify Functions)",
+    "status": "completed"
+  },
+  {
+    "id": "2",
+    "content": "[P1-2] Setup Turso local dev database and configure Drizzle schema with rooms, groups, roomBookings, guests tables",
+    "status": "completed"
+  },
+  {
+    "id": "3",
+    "content": "[P1-3] Create seed script to pre-populate 6 rooms with rates and push schema to database",
+    "status": "completed"
+  },
+  {
+    "id": "4",
+    "content": "[P2-1] Build Netlify Functions for Groups, Room Bookings, Guests, and Rooms APIs with pricing/availability logic",
+    "status": "completed"
+  },
+  {
+    "id": "5",
+    "content": "[P3-1] Create frontend views: Dashboard, Groups Master, Group Creation Flow, Master Calendar, Kitchen Report, Housekeeping",
+    "status": "completed"
+  },
+  {
+    "id": "6",
+    "content": "[P4-6] Add PWA configuration (manifest, service worker, install prompt) and authentication, test locally, deploy to production",
+    "status": "pending"
+  }
+]

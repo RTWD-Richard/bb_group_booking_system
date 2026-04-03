@@ -1,0 +1,37 @@
+[
+  {
+    "id": "0",
+    "content": "Add individual booking functionality (separate from groups)",
+    "status": "completed"
+  },
+  {
+    "id": "1",
+    "content": "Test critical functionality (availability checking, pricing calculations)",
+    "status": "pending"
+  },
+  {
+    "id": "2",
+    "content": "Add PWA manifest.json and service worker for offline support",
+    "status": "pending"
+  },
+  {
+    "id": "3",
+    "content": "Setup production Turso database and environment variables",
+    "status": "pending"
+  },
+  {
+    "id": "4",
+    "content": "Implement email OTP authentication (Better Auth + Resend)",
+    "status": "pending"
+  },
+  {
+    "id": "5",
+    "content": "Configure Netlify production deployment and deploy",
+    "status": "pending"
+  },
+  {
+    "id": "6",
+    "content": "Enhance calendar with visual timeline (optional enhancement)",
+    "status": "pending"
+  }
+]
