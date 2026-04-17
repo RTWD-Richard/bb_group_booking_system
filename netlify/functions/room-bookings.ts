@@ -22,7 +22,7 @@ async function checkAvailability(db: any, roomId: string, checkIn: Date, checkOu
 
   // Filter out the booking being updated
   const conflicts = excludeBookingId 
-    ? existingBookings.filter(b => b.id !== excludeBookingId)
+    ? existingBookings.filter((b: any) => b.id !== excludeBookingId)
     : existingBookings;
 
   return conflicts.length === 0;
