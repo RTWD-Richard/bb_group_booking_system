@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '@/components/Navigation';
 import { bookingsAPI, roomsAPI, guestsAPI, groupsAPI } from '@/lib/api';
-import { calculateDeposit } from '@/lib/deposit';
+import { calculateDeposit, DepositMode } from '@/lib/deposit';
 
 export default function EditBooking() {
   const params = useParams();
@@ -57,7 +57,7 @@ export default function EditBooking() {
   });
 
   // Deposit (manual entry or percentage)
-  const [depositMode, setDepositMode] = useState<'amount' | 'percentage'>('amount');
+  const [depositMode, setDepositMode] = useState<DepositMode>('amount');
   const [depositPercentage, setDepositPercentage] = useState(20);
 
   useEffect(() => {
@@ -571,7 +571,7 @@ export default function EditBooking() {
                     placeholder="Percentage"
                   />
                   <p className="text-sm text-slate-600 mt-1">
-                    Deposit Amount: £{depositAmount.toFixed(2)} ({depositPercentage}%)
+                    Deposit Amount: £{depositAmount.toFixed(2)} ({finalPrice > 0 ? ((depositAmount / finalPrice) * 100).toFixed(1) : depositPercentage}%)
                   </p>
                 </div>
               ) : (

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import { bookingsAPI, roomsAPI, guestsAPI, groupsAPI, settingsAPI } from '@/lib/api';
-import { calculateDeposit } from '@/lib/deposit';
+import { calculateDeposit, DepositMode } from '@/lib/deposit';
 
 export default function NewIndividualBooking() {
   const router = useRouter();
@@ -57,7 +57,7 @@ export default function NewIndividualBooking() {
   const [customPrice, setCustomPrice] = useState(0);
   
   // Deposit (manual entry or percentage)
-  const [depositMode, setDepositMode] = useState<'amount' | 'percentage'>('percentage');
+  const [depositMode, setDepositMode] = useState<DepositMode>('percentage');
   const [depositAmount, setDepositAmount] = useState(0);
   const [depositPercentage, setDepositPercentage] = useState(20);
 
@@ -676,9 +676,9 @@ export default function NewIndividualBooking() {
                         placeholder="Enter amount"
                         disabled={depositMode === 'percentage'}
                       />
-                      {depositMode === 'amount' && depositAmount > 0 && (
+                      {depositMode === 'amount' && getDepositAmount() > 0 && (
                         <p className="text-xs text-slate-500 mt-1">
-                          = {((depositAmount / getFinalPrice()) * 100).toFixed(1)}% of total
+                          = {((getDepositAmount() / getFinalPrice()) * 100).toFixed(1)}% of total
                         </p>
                       )}
                     </div>
@@ -785,9 +785,9 @@ export default function NewIndividualBooking() {
                         placeholder="Enter amount"
                         disabled={depositMode === 'percentage'}
                       />
-                      {depositMode === 'amount' && depositAmount > 0 && customPrice > 0 && (
+                      {depositMode === 'amount' && getDepositAmount() > 0 && customPrice > 0 && (
                         <p className="text-xs text-slate-500 mt-1">
-                          = {((depositAmount / customPrice) * 100).toFixed(1)}% of total
+                          = {((getDepositAmount() / customPrice) * 100).toFixed(1)}% of total
                         </p>
                       )}
                     </div>
