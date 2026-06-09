@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '@/components/Navigation';
 import { bookingsAPI, roomsAPI, guestsAPI, groupsAPI } from '@/lib/api';
+import { calculateDeposit } from '@/lib/deposit';
 
 export default function EditBooking() {
   const params = useParams();
@@ -122,14 +123,12 @@ export default function EditBooking() {
     return (ratePerNight * nights) + formData.mealCost - formData.manualDiscount;
   }
 
-  function getDepositAmount() {
-    if (depositMode === 'amount') {
-      return formData.depositAmount;
-    } else {
-      const total = calculateStandardPrice();
-      return (total * depositPercentage) / 100;
-    }
-  }
+  const getDepositAmount = () => calculateDeposit({
+    total: calculateStandardPrice(),
+    mode: depositMode,
+    amount: formData.depositAmount,
+    percentage: depositPercentage,
+  });
 
   function getBalanceDue() {
     return calculateStandardPrice() - getDepositAmount();

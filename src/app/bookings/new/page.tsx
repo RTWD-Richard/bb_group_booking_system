@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import { bookingsAPI, roomsAPI, guestsAPI, groupsAPI, settingsAPI } from '@/lib/api';
+import { calculateDeposit } from '@/lib/deposit';
 
 export default function NewIndividualBooking() {
   const router = useRouter();
@@ -105,14 +106,12 @@ export default function NewIndividualBooking() {
     return pricingMode === 'custom' ? customPrice : calculateStandardPrice();
   }
 
-  function getDepositAmount() {
-    if (depositMode === 'amount') {
-      return depositAmount;
-    } else {
-      const total = getFinalPrice();
-      return (total * depositPercentage) / 100;
-    }
-  }
+  const getDepositAmount = () => calculateDeposit({
+    total: getFinalPrice(),
+    mode: depositMode,
+    amount: depositAmount,
+    percentage: depositPercentage,
+  });
 
   function calculateBalance() {
     return getFinalPrice() - getDepositAmount();
