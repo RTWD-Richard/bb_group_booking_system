@@ -1,29 +1,22 @@
 import type { Handler } from '@netlify/functions';
-import { eq, and, or, lte, gte, between } from 'drizzle-orm';
+import { eq, and, lte, gte } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 import { getDb } from './utils/db';
 import { corsHeaders, handleCors } from './utils/cors';
 import { calculateBookingTotal } from './utils/pricing';
+import { rangesOverlap } from './utils/availability';
 import { roomBookings, rooms } from '../../src/db/schema';
 
 // Check if room is available for the date range
-// Two date ranges overlap if: start1 < end2 AND start2 < end1
 async function checkAvailability(db: any, roomId: string, checkIn: Date, checkOut: Date, excludeBookingId?: string) {
   const existingBookings = await db.select().from(roomBookings).where(
-    and(
-      eq(roomBookings.roomId, roomId),
-      // Date ranges overlap if: checkIn < existingCheckOut AND existingCheckIn < checkOut
-      and(
-        lte(roomBookings.checkIn, checkOut),
-        gte(roomBookings.checkOut, checkIn)
-      )
-    )
+    eq(roomBookings.roomId, roomId)
   );
 
-  // Filter out the booking being updated
-  const conflicts = excludeBookingId 
-    ? existingBookings.filter((b: any) => b.id !== excludeBookingId)
-    : existingBookings;
+  const conflicts = existingBookings.filter((b: any) =>
+    b.id !== excludeBookingId &&
+    rangesOverlap(checkIn, checkOut, new Date(b.checkIn), new Date(b.checkOut))
+  );
 
   return conflicts.length === 0;
 }
