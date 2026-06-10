@@ -49,7 +49,7 @@ npx netlify deploy --build --prod   # deploy
 src/app/               Pages (dashboard, bookings, groups, calendar, ...)
 src/components/        Shared components (Navigation, Calendar)
 src/db/                Drizzle schema and client
-src/lib/               Frontend helpers (API wrapper, pricing, deposits)
+src/lib/               Frontend helpers (API wrapper, deposits, room colours)
 netlify/functions/     API endpoints (rooms, guests, groups, room-bookings, settings)
 tests/                 Vitest unit tests
 plans/                 Implementation plans and status reports
