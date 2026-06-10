@@ -1,12 +1,17 @@
 import { drizzle } from 'drizzle-orm/sqlite-proxy';
-import { createClient } from '@libsql/client';
 import * as schema from '../../../src/db/schema';
 
-// Database client for Netlify Functions
-// Uses local file in dev, HTTP client in production
+// Database client for Netlify Functions.
+// file: URLs (local dev) need the native client; Turso URLs use the HTTP-only
+// web client, because the functions bundle is built on the dev machine and a
+// platform-native binary would not match the Lambda runtime.
 export function getDb() {
   const databaseUrl = process.env.DATABASE_URL || 'file:./dev.db';
-  
+
+  const { createClient } = databaseUrl.startsWith('file:')
+    ? require('@libsql/client')
+    : require('@libsql/client/web');
+
   const client = createClient({
     url: databaseUrl,
     authToken: process.env.DATABASE_AUTH_TOKEN,
