@@ -13,6 +13,7 @@
       "dependencies": [
         "npm:@libsql/client@~0.15.15",
         "npm:@netlify/functions@^5.1.2",
+        "npm:@netlify/plugin-nextjs@^5.15.9",
         "npm:@tailwindcss/postcss@4",
         "npm:@types/node@20",
         "npm:@types/react-dom@19",
@@ -29,7 +30,8 @@
         "npm:tailwindcss@4",
         "npm:tsx@^4.21.0",
         "npm:typescript@5",
-        "npm:uuid@13"
+        "npm:uuid@13",
+        "npm:vitest@^4.1.8"
       ]
     }
   }
